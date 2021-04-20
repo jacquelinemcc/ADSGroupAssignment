@@ -6,6 +6,7 @@ public class testGit {
 
 		//add your name to string and commit to github to test
 		String testString = "jacqueline";
+		System.out.println("Emily was here");
 	}
 
 }
