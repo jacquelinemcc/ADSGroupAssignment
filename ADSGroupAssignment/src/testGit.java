@@ -5,7 +5,7 @@ public class testGit {
 		// TODO Auto-generated method stub
 
 		//add your name to string and commit to github to test
-		String testString = "jacqueline";
+		String testString = "jacquelineMCC";
 	}
 
 }
