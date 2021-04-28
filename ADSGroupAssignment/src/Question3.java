@@ -1,28 +1,31 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import java.io.*;
 import java.util.*;
 
 public class Question3 {
 
-	//public static HashMap<String, ArrayList<String>> stopTimes = new HashMap<String, ArrayList<String>>();
 	public static String file3 = "Stop_times.txt";
+	public static HashMap<String, ArrayList<String>> stopTimesMap = new HashMap<String, ArrayList<String>>();
 
 	public static void main(String[] args) {
 
-		Map<String, String> stopTimesMap = HashMapFromTextFile();
+		stopTimesMap = HashMapFromTextFile();
+		System.out.println("Please enter an arrival time you would like to search for (in the format hh:mm:ss)");
+		Scanner input = new Scanner (System.in);
+		String userInputTime = input.next();
+		ArrayList<String> tripsWithUserTime = findRelevantTimes(userInputTime);
 
-		for (Map.Entry<String, String> entry:stopTimesMap.entrySet()) {
-			System.out.println(entry.getKey() + " : " + entry.getValue());
-		}
+		for(int i = 0; i < tripsWithUserTime.size(); i++) {   
+			System.out.println(tripsWithUserTime.get(i));
+		}  
+
 	}
 
-	public static Map<String, String> HashMapFromTextFile(){
+	public static HashMap<String, ArrayList<String>> HashMapFromTextFile(){
 
-		Map<String, String> map = new HashMap<String, String>();
+		HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
 		BufferedReader br = null;
+
 
 		try {
 
@@ -30,19 +33,27 @@ public class Question3 {
 			br = new BufferedReader(new FileReader(file));
 			String line = null;
 			line = br.readLine();
-			
+
 			while ((line = br.readLine()) != null) {
 
-				String stopDetails = line;
 				String[] parts = line.split(",");
 				String time = parts[1].trim();
 
 				if(validTime(time) == true) {
-					if (!time.equals("") && !stopDetails.equals(""))
-						map.put(time, stopDetails);
+					if (!time.equals("") && !line.equals("")) {
+						if(map.containsKey(time)) {
+							map.get(time).add(line);
+						}
+						else {
+							ArrayList<String> tripInfo = new ArrayList<>();
+							tripInfo.add(line);
+							map.put(time, tripInfo);
+						}
+					}
+
 				}
 			}
-
+			return map;
 		}
 		catch (Exception e) {e.printStackTrace();}
 
@@ -93,137 +104,61 @@ public class Question3 {
 	}
 
 
-}
+	public static ArrayList<String> findRelevantTimes(String userInputTime){
+		ArrayList<String> relevantTimes = new ArrayList<String>();
 
-// Java program to reading
-//text file to HashMap
-/*
-class GFG {
-	final static String filePath
-	= "F:/Serialisation/write.txt";
-	/*public static void main(String[] args)
- {
-
-     // read text file to HashMap
-     Map<String, String> mapFromFile
-         = HashMapFromTextFile();
-
-     // iterate over HashMap entries
-     for (Map.Entry<String, String> entry :mapFromFile.entrySet()) {
-         System.out.println(entry.getKey() + " : " + entry.getValue());
-     }
- }*/
-/*
-	public static Map<String, String> HashMapFromTextFile()
-	{
-
-		Map<String, String> map
-		= new HashMap<String, String>();
-		BufferedReader br = null;
-
-		try {
-
-			// create file object
-			File file = new File(filePath);
-
-			// create BufferedReader object from the File
-			br = new BufferedReader(new FileReader(file));
-
-			String line = null;
-
-			// read file line by line
-			while ((line = br.readLine()) != null) {
-
-				// split the line by :
-				String[] parts = line.split(":");
-
-				// first part is name, second is number
-				String name = parts[0].trim();
-				String number = parts[1].trim();
-
-				// put name, number in HashMap if they are
-				// not empty
-				if (!name.equals("") && !number.equals(""))
-					map.put(name, number);
+		if(validTime(userInputTime)==true) {
+			if(stopTimesMap.containsKey(userInputTime)) {
+				relevantTimes = stopTimesMap.get(userInputTime);
+				printSortedTimes(relevantTimes);
+			}
+			else {
+				relevantTimes.add("The time "+userInputTime+" does not have any trips occurring.");
 			}
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		else {
+			relevantTimes.add("This is not a valid time. Please enter a time in the format hh:mm:ss within 24hrs and minutes and seconds no longer than 60.");
 		}
-		finally {
+		return relevantTimes;
+	}
 
-			// Always close the BufferedReader
-			if (br != null) {
-				try {
-					br.close();
+
+
+	public static void printSortedTimes(ArrayList<String> relevantTimes) {
+
+		int[] stopIDs = new int[relevantTimes.size()];
+
+		for(int i=0; i<stopIDs.length; i++) {
+			String info = relevantTimes.get(i);
+			String[] parts = info.split(",");
+			stopIDs[i] = Integer.parseInt(parts[0].trim());
+		}
+
+		int temp;
+		for (int i=0; i<stopIDs.length; i++) {
+			for(int j=i; j>0; j--) {
+				if(stopIDs[j] < stopIDs[j-1]) {
+					temp = stopIDs[j];
+					stopIDs[j] = stopIDs[j-1];
+					stopIDs[j-1] = temp;
+
+					String temp1 = relevantTimes.get(j);
+					relevantTimes.set(j, relevantTimes.get(j-1));
+					relevantTimes.set(j-1, temp1);
+					
+
 				}
-				catch (Exception e) {
-				};
 			}
 		}
-
-		return map;
 	}
 }
- */
-
-/*public String file3 = "Stop_times.txt";
-	public static double stopDetails [][];
 
 
 
-	public static double[] fileReading(String file3){
 
-		try
-    	{
-    		File file = new File(file3);
-        	Scanner scanner = new Scanner(file);
-        	int i = 0;
 
-        	while(scanner.hasNextLine())
-        	{
-        		String [] line = scanner.nextLine().trim().split("\\s+");
-        		if(i == 0)	
-        		{
-        			stopDetails = new double[Integer.parseInt(line[i])][Integer.parseInt(line[i])];
-            		//edgeTo = new int[Integer.parseInt(line[i])][Integer.parseInt(line[i])];
 
-            		for(int j = 0; j < distanceTo.length; j++)
-            		{
-            			for(int k = 0; k < distanceTo[j].length; k++)
-            			{
-            				distanceTo[j][k] = Integer.MAX_VALUE;
-            				if(j == k)
-            				{
-            					distanceTo[j][k] = 0;
-            				}
-            			}	
-            		}
-            	}
-        		else if(i == 1)
-        		{
-        			edgeCount = Integer.parseInt(line[i - 1]);
-        		}
-        		else
-        		{
-        			distanceTo[Integer.parseInt(line[0])][Integer.parseInt(line[1])] = Double.parseDouble(line[2]);
-        			edgeTo[Integer.parseInt(line[0])][Integer.parseInt(line[1])] = Integer.parseInt(line[0]);
 
-        		}
-        		i++;	
-        	}
 
-        	for(int j = 0; j < distanceTo.length; j++)
-        	{
-        		shortestPath(j);
-        	}
-        	scanner.close();
-    	}
-    	catch(Exception x)
-    	{
-    		distanceTo = new double[0][0];
-    		edgeTo = new int[0][0];
-    		return;
-    	}
- */
+
 
