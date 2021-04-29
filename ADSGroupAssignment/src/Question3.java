@@ -15,8 +15,15 @@ public class Question3 {
 		String userInputTime = input.next();
 		ArrayList<String> tripsWithUserTime = findRelevantTimes(userInputTime);
 
-		for(int i = 0; i < tripsWithUserTime.size(); i++) {   
-			System.out.println(tripsWithUserTime.get(i));
+		System.out.println("The details for trips arriving at "+userInputTime+" are: ");
+		System.out.println("Trip ID\tDeparture Time\tStop ID\t Stop Sequence\tPick Up\tDrop Off\tShape Distance Travelled");
+		for(int i = 0; i < tripsWithUserTime.size(); i++) { 
+			String [] tripDetails = tripsWithUserTime.get(i).split(",");
+		
+			
+			if(tripDetails.length==9)
+				System.out.println(tripDetails[0]+"\t"+tripDetails[2]+"\t"+tripDetails[3]+"\t\t"+tripDetails[4]+"\t"+tripDetails[6]+"\t"+tripDetails[7]+"\t\t"+tripDetails[8]);
+			else System.out.println(tripDetails[0]+"\t"+tripDetails[2]+"\t"+tripDetails[3]+"\t\t"+tripDetails[4]+"\t"+tripDetails[6]+"\t"+tripDetails[7]+"\t\t0");
 		}  
 
 	}
@@ -146,8 +153,6 @@ public class Question3 {
 					String temp1 = relevantTimes.get(j);
 					relevantTimes.set(j, relevantTimes.get(j-1));
 					relevantTimes.set(j-1, temp1);
-					
-
 				}
 			}
 		}
