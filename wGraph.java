@@ -5,11 +5,35 @@ import java.util.ArrayList;
 
 public class wGraph {
     public static ArrayList<ArrayList<dirEdge>> edges;
+    public static int stopCount;
 
     public wGraph() {
-    	initialiseArray();
+    	stopCount = countStops();
+        edges = new ArrayList<>(stopCount*17);
+        for (int i = 0; i < (stopCount*17); i++) {
+            edges.add(new ArrayList<dirEdge>());
+        }
+        stopTimesToArrayList();
+        transfersToArrayList();
     }
-    	
+    private static int countStops() {
+        try{
+            String filename = "stops.txt";
+            File file = new File(filename);
+            Scanner scanner = new Scanner(file);
+            scanner.useDelimiter(",");
+            scanner.nextLine();
+            int i =0;
+            while(scanner.hasNext()) {
+                    scanner.nextLine();
+                    i++;
+                
+            }
+            scanner.close();
+            return i;
+        }   
+        catch(FileNotFoundException e){System.out.println("File 'stops.txt' not found");return 0;}
+    }
     private static void stopTimesToArrayList() {
     try {
     	
@@ -86,17 +110,6 @@ public class wGraph {
 
     
 
-    public static void initialiseArray(){
-  
-        edges = new ArrayList<>(8000*15);
-        for (int i = 0; i < (8000*15); i++) {
-            edges.add(new ArrayList<dirEdge>());
-        }
-        stopTimesToArrayList();
-        transfersToArrayList();
-        }
-    
-   
     
     
 }

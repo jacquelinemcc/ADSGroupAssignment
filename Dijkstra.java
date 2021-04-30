@@ -9,9 +9,9 @@ public class Dijkstra {
 	public String shortestRoute;
 	
 	public Dijkstra(wGraph map, int startPoint, int endPoint) {
-        this.distanceTo = new double[20000];
-        this.edgeTo = new dirEdge[20000];
-        this.visited = new boolean[20000];
+        this.distanceTo = new double[wGraph.stopCount];
+        this.edgeTo = new dirEdge[wGraph.stopCount];
+        this.visited = new boolean[wGraph.stopCount];
         for (int i = 0; i < distanceTo.length; i++) {
             distanceTo[i] = Double.POSITIVE_INFINITY;
             visited[i] = false;		
@@ -40,7 +40,6 @@ public class Dijkstra {
         	int stop = edge.get(i).stop;
         	int nextStop = edge.get(i).nextStop;
         	double weight = edge.get(i).weight;
-        	System.out.println(stop + " " + nextStop);
         if (distanceTo[nextStop] > (distanceTo[stop] + weight)) {
             distanceTo[nextStop] = distanceTo[stop] + weight;
             edgeTo[nextStop] = edge.get(i);
