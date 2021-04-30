@@ -1,6 +1,9 @@
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.*;
-import java.util.*;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class Question3 {
 
@@ -13,11 +16,27 @@ public class Question3 {
 		System.out.println("Please enter an arrival time you would like to search for (in the format hh:mm:ss)");
 		Scanner input = new Scanner (System.in);
 		String userInputTime = input.next();
-		ArrayList<String> tripsWithUserTime = findRelevantTimes(userInputTime);
+		
+		if (!userInputTime.matches("^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$")){
+		     System.out.println( userInputTime+ " is not a valid time. Please enter a time in the format hh:mm:ss within 24hrs and minutes and seconds no longer than 60.");
+				
+		} 
+		
+		else {
+		
+			ArrayList<String> tripsWithUserTime = findRelevantTimes(userInputTime);
 
-		for(int i = 0; i < tripsWithUserTime.size(); i++) {   
-			System.out.println(tripsWithUserTime.get(i));
-		}  
+			System.out.println("The details for trips arriving at "+userInputTime+" are: ");
+			System.out.println("Trip ID\tDeparture Time\tStop ID\t Stop Sequence\tPick Up\tDrop Off\tShape Distance Travelled");
+			for(int i = 0; i < tripsWithUserTime.size(); i++) { 
+				String [] tripDetails = tripsWithUserTime.get(i).split(",");
+		
+			
+				if(tripDetails.length==9)
+					System.out.println(tripDetails[0]+"\t"+tripDetails[2]+"\t"+tripDetails[3]+"\t\t"+tripDetails[4]+"\t"+tripDetails[6]+"\t"+tripDetails[7]+"\t\t"+tripDetails[8]);
+				else System.out.println(tripDetails[0]+"\t"+tripDetails[2]+"\t"+tripDetails[3]+"\t\t"+tripDetails[4]+"\t"+tripDetails[6]+"\t"+tripDetails[7]+"\t\t0");
+			} 
+		}
 
 	}
 
@@ -39,7 +58,7 @@ public class Question3 {
 				String[] parts = line.split(",");
 				String time = parts[1].trim();
 
-				if(validTime(time) == true) {
+				//if(validTime(time) == true) {
 					if (!time.equals("") && !line.equals("")) {
 						if(map.containsKey(time)) {
 							map.get(time).add(line);
@@ -51,7 +70,7 @@ public class Question3 {
 						}
 					}
 
-				}
+				//}
 			}
 			return map;
 		}
@@ -70,44 +89,12 @@ public class Question3 {
 		return map;
 	}
 
-	public static boolean validTime(String time) {
-		boolean isValidTime = false;
-		boolean isValidHour = false;
-		boolean isValidMinute = false;
-		boolean isValidSecond = false;
-
-
-		String[] timeP1 = time.split(":");
-		int hour = Integer.parseInt(timeP1[0].trim());  
-
-		String[] timeP2 = time.split(":");
-		int minute = Integer.parseInt(timeP2[1].trim());  
-
-		String[] timeP3 = time.split(":");
-		int second = Integer.parseInt(timeP3[2].trim());  
-
-
-		if(hour<24 && hour>=0) {
-			isValidHour = true;
-		}
-		if(minute<60 && minute>=0) {
-			isValidMinute = true;
-		}
-		if(second<60 && second>=0) {
-			isValidSecond = true;
-		}
-		if(isValidHour == true && isValidMinute == true && isValidSecond == true) {
-			isValidTime = true;
-		}
-
-		return isValidTime;
-	}
+	
 
 
 	public static ArrayList<String> findRelevantTimes(String userInputTime){
 		ArrayList<String> relevantTimes = new ArrayList<String>();
 
-		if(validTime(userInputTime)==true) {
 			if(stopTimesMap.containsKey(userInputTime)) {
 				relevantTimes = stopTimesMap.get(userInputTime);
 				printSortedTimes(relevantTimes);
@@ -115,12 +102,12 @@ public class Question3 {
 			else {
 				relevantTimes.add("The time "+userInputTime+" does not have any trips occurring.");
 			}
-		}
-		else {
-			relevantTimes.add("This is not a valid time. Please enter a time in the format hh:mm:ss within 24hrs and minutes and seconds no longer than 60.");
-		}
+			
 		return relevantTimes;
-	}
+		}
+		
+		
+	
 
 
 
@@ -145,16 +132,11 @@ public class Question3 {
 					String temp1 = relevantTimes.get(j);
 					relevantTimes.set(j, relevantTimes.get(j-1));
 					relevantTimes.set(j-1, temp1);
-					
-
 				}
 			}
 		}
 	}
 }
-
-
-
 
 
 
