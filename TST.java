@@ -3,8 +3,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -135,33 +134,33 @@ public class TST <Value>
 		{
 			throw new IllegalArgumentException("There has been no prefix entered");
 		}
-		Queue<String> queue = new LinkedList<String>();
+		ArrayList<String> listOfNames = new ArrayList<String>();
 		Node<Value> node = get(root, prefix, 0);
 		if (node == null) 
 		{
-			return queue;
+			return listOfNames;
 		}
 		if (node.value != null)
 		{
-			queue.add(prefix);
+			listOfNames.add(prefix);
 		}
-		collect(node.middle, new StringBuilder(prefix), queue);
-		return queue;
+		collect(node.middle, new StringBuilder(prefix), listOfNames);
+		return listOfNames;
 	}
 
-	private void collect(Node<Value> node, StringBuilder prefix, Queue<String> queue) {
+	private void collect(Node<Value> node, StringBuilder prefix, ArrayList<String> listOfNames) {
 		if (node == null) 
 		{
 			return;
 		}
-		collect(node.left,  prefix, queue);
+		collect(node.left,  prefix, listOfNames);
 		if (node.value != null) 
 		{
-			queue.add(prefix.toString() + node.character);
+			listOfNames.add(prefix.toString() + node.character);
 		}
-		collect(node.middle, prefix.append(node.character), queue);
+		collect(node.middle, prefix.append(node.character), listOfNames);
 		prefix.deleteCharAt(prefix.length() - 1);
-		collect(node.right, prefix, queue);
+		collect(node.right, prefix, listOfNames);
 	}
 	
 	public static String formatAddress(String address)
