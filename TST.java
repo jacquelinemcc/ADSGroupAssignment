@@ -1,18 +1,22 @@
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
+
 
 public class TST <Value>
 {
-	public static String file = "src/stops.txt";
-	TST<String> tree = new TST<String>();
+
 	private int size;
 	private Node<Value> root;
 	
 	private static class Node<Value>
 	{
 		private char character;
-		private Node<Value> left, mid, right;
+		private Node<Value> left, middle, right;
 		private Value value;
 	}
 	
@@ -27,68 +31,68 @@ public class TST <Value>
 		return size;
 	}
 	
-	public boolean contains (String key)
+	public boolean contains (String stopInformation)
 	{
-		if(key == null) 
+		if(stopInformation == null) 
 		{
-			throw new IllegalArgumentException("this is null");
+			throw new IllegalArgumentException("This is null");
 		}
-		return get(key) != null;
+		return get(stopInformation) != null;
 	}
 	
 	
-	public Value get(String key) 
+	public Value get(String stopInformation) 
 	{
-		if(key == null)
+		if(stopInformation == null)
 		{
-			throw new IllegalArgumentException("this is null");
+			throw new IllegalArgumentException("There is no stop name entered.");
 		}
-		if(key.length() == 0)
+		if(stopInformation.length() == 0)
 		{
-			throw new IllegalArgumentException("key must be greater than 1");
+			throw new IllegalArgumentException("The stop name must not have 0 letters");
 		}
-		Node<Value> value = get(root, key, 0);
-		if(value == null)
+		Node<Value> node = get(root, stopInformation, 0);
+		if(node == null)
 		{
 			return null;
 		}
-		return value.value;		
+		return node.value;		
 	}
 	
-	private Node<Value> get(Node<Value> value, String key, int index)
+	private Node<Value> get(Node<Value> node, String stopInformation, int index)
 	{
-		if(value == null)
+		if(node == null)
 		{
 			return null;
 		}
-		if(key.length() == 0)
+		if(stopInformation.length() == 0)
 		{
-			throw new IllegalArgumentException("key must be greater than 1");
+			throw new IllegalArgumentException("The stop name must not have 0 letters");
 		}
-		char character = key.charAt(index);
-		if(character < value.character)
+		char character = stopInformation.charAt(index);
+		if(character < node.character)
 		{
-			return get(value.left, key, index);
+			return get(node.left, stopInformation, index);
 		}
-		else if(character > value.character)
+		else if(character > node.character)
 		{
-			return get(value.right, key, index);
+			return get(node.right, stopInformation, index);
 		}
-		else if(index < key.length()-1)
+		else if(index < stopInformation.length()-1)
 		{
-			return get(value.mid, key, index+1);
+			return get(node.middle, stopInformation, index+1);
 		}
-		else return value;
+		else return node;
 	}
 	
 	
-	public void put(String key, Value value)
+	public void put(String stopInformation, Value value)
 	{
-		if(key == null)
+		if(stopInformation == null)
 		{
 			throw new IllegalArgumentException("this is null");
 		}
-		if(!contains(key))
+		if(!contains(stopInformation))
 		{
 			size++;
 		}
@@ -96,41 +100,75 @@ public class TST <Value>
 		{
 			size--;
 		}
-		root = put(root, key, value, 0);
+		root = put(root, stopInformation, value, 0);
 	}
 	
-	private Node<Value> put(Node<Value> x, String key, Value value, int index)
+	private Node<Value> put(Node<Value> node, String stopInformation, Value value, int index)
 	{
-		char character = key.charAt(index);
-		if(x == null)
+		char character = stopInformation.charAt(index);
+		if(node == null)
 		{
-			x = new Node<Value>();
-			x.character = character;
+			node = new Node<Value>();
+			node.character = character;
 		}
 		
-		if(character < x.character)
+		if(character < node.character)
 		{
-			x.left = put(x.left, key, value, index);
+			node.left = put(node.left, stopInformation, value, index);
 		}
-		else if(character > x.character)
+		else if(character > node.character)
 		{
-			x.right = put(x.right, key, value, index);
+			node.right = put(node.right, stopInformation, value, index);
 		}
-		else if(index < key.length()-1)
+		else if(index < stopInformation.length()-1)
 		{
-			x.mid = put(x.mid, key, value, index+1);
+			node.middle = put(node.middle, stopInformation, value, index+1);
 		}
-		else x.value = value;
-		return x;
+		else node.value = value;
+		return node;
 	}
 	
-	
-	
+	public Iterable<String> keysWithGivenPrefix(String prefix) 
+	{
+		if (prefix == null) 
+		{
+			throw new IllegalArgumentException("There has been no prefix entered");
+		}
+		ArrayList<String> listOfNames = new ArrayList<String>();
+		Node<Value> node = get(root, prefix, 0);
+		if (node == null) 
+		{
+			return listOfNames;
+		}
+		if (node.value != null)
+		{
+			listOfNames.add(prefix);
+		}
+		collect(node.middle, new StringBuilder(prefix), listOfNames);
+		return listOfNames;
+	}
+
+	private void collect(Node<Value> node, StringBuilder prefix, ArrayList<String> listOfNames) {
+		if (node == null) 
+		{
+			return;
+		}
+		collect(node.left,  prefix, listOfNames);
+		if (node.value != null) 
+		{
+			listOfNames.add(prefix.toString() + node.character);
+		}
+		collect(node.middle, prefix.append(node.character), listOfNames);
+		prefix.deleteCharAt(prefix.length() - 1);
+		collect(node.right, prefix, listOfNames);
+	}
 	
 	public static String formatAddress(String address)
 	{
+		
 		String[] parts = address.split(",");
-		String stopName = parts[3].trim();
+		
+		String stopName = parts[2].trim();
 		String [] splitAddress = stopName.split(" ");
 		String startOfAddress = splitAddress[0].trim();
 		String endOfAddress = "";
@@ -156,43 +194,74 @@ public class TST <Value>
 			}
 
 		}
-		else return address;
+		else return stopName;
 	}
 	
 	
 	
-	public static void returnTreeFromFile()
-	{
 
-		Scanner myReader = new Scanner(file);
-		
-		
-		while(myReader.hasNextLine())
-		{
-			String data = myReader.nextLine();
-			formatAddress(data);
-		}
-	}
 	
 	public static void main(String[] args)
 	{
 		TST<String> tree = new TST<String>();
-		TST<String> newTree = tree.returnTreeFromFile();
-		System.out.println("Please enter the first name of the stop you're looking for:");
-		Scanner userInput = new Scanner(System.in);
 
-		String stopName = userInput.nextLine();
+		try {
+			File filePath = new File("stops.txt");
+			String line = "";
+			BufferedReader br = new BufferedReader(new FileReader(filePath));
 
-		
-		System.out.println("Heres the information on that stop " + tree.get(stopName));
+			while((line = br.readLine()) != null)
+			{
+				String addressKey = formatAddress(line); 
+				tree.put(addressKey, line);			
+			}
+
+		}
+		catch(FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		System.out.println("Enter 1 if you want to search by first name or enter 2 if you want to search by full address");
+		Scanner firstQuestion = new Scanner(System.in);
+		if(firstQuestion.hasNext("1"))
+		{
+			System.out.println("Please enter the first name or the first few letters of the stop you're looking for (using all capital letters): ");
+			Scanner userInput1 = new Scanner(System.in);
+
+			String stopName1 = userInput1.nextLine();
+
+			for(String element: tree.keysWithGivenPrefix(stopName1))
+			{
+					System.out.println("The information for this stop is :(Stop ID, Stop Code, Stop Name, Stop Address, Stop Latitude, Stop Longitude, Zone ID, Stop URL, Location Type, Parent Station): " + tree.get(element));				
+			}
+
+		}
+
+		else if(firstQuestion.hasNext("2"))
+		{
+			System.out.println("Please enter the full address of the stop you're looking for:");
+			Scanner userInput2 = new Scanner(System.in);
+
+			String stopName2 = userInput2.nextLine();
+
+			if(tree.contains(stopName2)) 
+			{
+				System.out.println("The information for this stop is :(Stop ID, Stop Code, Stop Name, Stop Address, Stop Latitude, Stop Longitude, Zone ID, Stop URL, Location Type, Parent Station): " + tree.get(stopName2));
+			}
+			else
+			{
+				System.out.println("Please enter the correct name of a bus stop");
+			}
+
+		}
+		else
+		{
+			System.out.println("Please enter either 1 or 2");
+		}
 	}
-	
-	public static String [] stopArray = new String[file.length()];
-	
-	public static void stopArray(String string, int i)
-	{
-		stopArray[i] = string;
-	}
-	
-	
 }
