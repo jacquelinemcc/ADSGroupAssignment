@@ -125,6 +125,8 @@ public class TST <Value>
 	}
 	
 	
+	
+	
 	public static String formatAddress(String address)
 	{
 		String[] parts = address.split(",");
@@ -158,31 +160,24 @@ public class TST <Value>
 	}
 	
 	
-	public static TST<String> returnTreeFromFile()
+	
+	public static void returnTreeFromFile()
 	{
-		TST<String> tree = new TST<String>();
-		BufferedReader br = null;
-		br = new BufferedReader(new FileReader(file));
-		String stopName = formatAddress(file);
-		String line = null;
-		line = br.readLine();
+
+		Scanner myReader = new Scanner(file);
 		
-		while((line = br.readLine()) != null)
+		
+		while(myReader.hasNextLine())
 		{
-			
-			for(int i = 0; i < file.length(); i++)
-			{
-				tree.put(stopName, i);
-			}
-			
+			String data = myReader.nextLine();
+			formatAddress(data);
 		}
 	}
 	
 	public static void main(String[] args)
 	{
-		TST<String> tree = returnTreeFromFile();
-
-
+		TST<String> tree = new TST<String>();
+		TST<String> newTree = tree.returnTreeFromFile();
 		System.out.println("Please enter the first name of the stop you're looking for:");
 		Scanner userInput = new Scanner(System.in);
 
@@ -191,4 +186,13 @@ public class TST <Value>
 		
 		System.out.println("Heres the information on that stop " + tree.get(stopName));
 	}
+	
+	public static String [] stopArray = new String[file.length()];
+	
+	public static void stopArray(String string, int i)
+	{
+		stopArray[i] = string;
+	}
+	
+	
 }
