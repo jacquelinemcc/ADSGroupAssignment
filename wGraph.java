@@ -6,13 +6,15 @@ import java.util.ArrayList;
 public class wGraph {
     public static ArrayList<ArrayList<dirEdge>> edges;
 
-    	
+    public wGraph() {
+    	initialiseArray();
+    }
     	
     private static void stopTimesToArrayList() {
     try {
     	
-    	 int route, stop, nextStop ;
-    	 int nextRoute;
+    	 int route, stop, nextStop =0;
+    	 int nextRoute = 0;
     	 
     	String fileName = "stop_times.txt";
     	File file = new File(fileName);
@@ -23,15 +25,13 @@ public class wGraph {
         scanner.next();
         scanner.next();
         stop = scanner.nextInt();
-
+        scanner.nextLine();
 		while (scanner.hasNext()) {
-			scanner.nextLine();
 			nextRoute = scanner.nextInt();
 			scanner.next();
 	        scanner.next();
 	        nextStop = scanner.nextInt();
 			if(route == nextRoute) {
-		        
 				edges.get(stop).add(new dirEdge(stop, nextStop, 1));
 			}
 			else {
@@ -39,7 +39,8 @@ public class wGraph {
 				
 			}
 			stop = nextStop;
-			}
+			scanner.nextLine();
+		}
 		
 		scanner.close();
 	}
@@ -49,7 +50,8 @@ public class wGraph {
     private static void transfersToArrayList() {
         try {
         	
-        	 int stop, nextStop, weightType,weight;
+        	 int stop, nextStop, weightType = 0;
+        	 double weight = 0;
         	 
         	String fileName = "transfers.txt";
         	File file = new File(fileName);
@@ -63,10 +65,17 @@ public class wGraph {
                 nextStop = scanner.nextInt();
                 weightType = scanner.nextInt();
                 if(weightType==0) { weight = 2;}
-                else { weight = (scanner.nextInt())/100;}
+                else { 
+                	scanner.useDelimiter("\n");
+                	String line = scanner.next();
+                	String[] parts = line.split(",");
+                	weight = (Double.parseDouble(parts[1].trim()))/100;
+                	scanner.useDelimiter(",");
+
+                }
               
     			edges.get(stop).add(new dirEdge(stop, nextStop, weight));
-    			stop = nextStop;
+    			scanner.nextLine();
     			}
     		
     		scanner.close();
@@ -77,18 +86,18 @@ public class wGraph {
 
     
 
-    public static void main(String[] args) {
+    public static void initialiseArray(){
   
-        edges = new ArrayList<>(10000);
-        for (int i = 0; i < (10000); i++) {
-            edges.add(new ArrayList<>());
+        edges = new ArrayList<>(8000*15);
+        for (int i = 0; i < (8000*15); i++) {
+            edges.add(new ArrayList<dirEdge>());
         }
-        
         stopTimesToArrayList();
         transfersToArrayList();
-        for (int i = 0; i < (10000); i++) {
-            System.out.println(edges.get(i));
         }
-    }
+    
+   
+    
+    
 }
 

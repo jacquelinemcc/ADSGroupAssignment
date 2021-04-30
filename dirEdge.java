@@ -1,11 +1,11 @@
 public class dirEdge {
-    public int sourceNode;
-    public int nextNode;
+    public int stop;
+    public int nextStop;
     public double weight;
 
-    public dirEdge(int sourceNode, int nextNode, double weight) {
-        this.sourceNode = sourceNode;
-        this.nextNode = nextNode;
+    public dirEdge(int stop, int nextStop, double weight) {
+        this.stop = stop;
+        this.nextStop = nextStop;
         this.weight = weight;
     }
 }
