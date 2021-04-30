@@ -124,71 +124,71 @@ public class TST <Value>
 		return x;
 	}
 	
-	public static TST<Value> treeFromFile()
+	
+	public static String formatAddress(String address)
+	{
+		String[] parts = address.split(",");
+		String stopName = parts[3].trim();
+		String [] splitAddress = stopName.split(" ");
+		String startOfAddress = splitAddress[0].trim();
+		String endOfAddress = "";
+		
+		if(startOfAddress.equals("FLAGSTOP") || startOfAddress.equals("NB") || startOfAddress.equals("WB") || startOfAddress.equals("SB") || startOfAddress.equals("EB"))
+		{
+			if(splitAddress[1].equals("WB") || splitAddress[1].equals("SB") || splitAddress[1].equals("EB") || splitAddress[1].equals("NB"))
+			{
+				startOfAddress += " "+splitAddress[1];
+				for(int i = 2; i < splitAddress.length; i++)
+				{
+					endOfAddress += splitAddress[i].trim()+" ";
+				}
+				return endOfAddress+startOfAddress;
+			}
+			else 
+			{
+				for(int i = 1; i < splitAddress.length; i++)
+				{
+					endOfAddress += splitAddress[i]+" ";
+				}
+			return endOfAddress+startOfAddress;
+			}
+
+		}
+		else return address;
+	}
+	
+	
+	public static TST<String> returnTreeFromFile()
 	{
 		TST<String> tree = new TST<String>();
 		BufferedReader br = null;
 		br = new BufferedReader(new FileReader(file));
+		String stopName = formatAddress(file);
 		String line = null;
 		line = br.readLine();
 		
 		while((line = br.readLine()) != null)
 		{
-			String stopDetails = line;
-			String[] parts = line.split(",");
-			String stopName = parts[3].trim();
-			String [] splitAddress = stopName.split(" ");
-			String startOfAddress = splitAddress[0].trim();
-			String endOfAddress = "";
 			
-			if(startOfAddress.equals("FLAGSTOP") || startOfAddress.equals("NB") || startOfAddress.equals("WB") || startOfAddress.equals("SB") || startOfAddress.equals("EB"))
+			for(int i = 0; i < file.length(); i++)
 			{
-				if(splitAddress[1].equals("WB") || splitAddress[1].equals("SB") || splitAddress[1].equals("EB") || splitAddress[1].equals("NB"))
-				{
-					startOfAddress += " "+splitAddress[1];
-					for(int i = 2; i < splitAddress.length; i++)
-					{
-						endOfAddress += splitAddress[i].trim()+" ";
-					}
-					return endOfAddress+startOfAddress;
-				}
-				else 
-				{
-					for(int i = 1; i < splitAddress.length; i++)
-					{
-						endOfAddress += splitAddress[i]+" ";
-					}
-				return endOfAddress+startOfAddress;
-				}
-
+				tree.put(stopName, i);
 			}
-			else return address;
 			
 		}
 	}
 	
 	public static void main(String[] args)
 	{
-		TST<String> tree = treeFromFile();
+		TST<String> tree = returnTreeFromFile();
 
-		
-		for (int i = 0; i < file.length(); i++)
-		{
-			tree.put(file, i);
-		}
-		
-		
-		/*
+
 		System.out.println("Please enter the first name of the stop you're looking for:");
 		Scanner userInput = new Scanner(System.in);
 
 		String stopName = userInput.nextLine();
 
 		
-		
-		String input2 = "Emma";
-		*/
-		
-		System.out.println(tree);
+		System.out.println("Heres the information on that stop " + tree.get(stopName));
 	}
 }
