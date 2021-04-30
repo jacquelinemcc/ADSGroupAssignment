@@ -1,11 +1,17 @@
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
+
 
 public class TST <Value>
 {
-	public static String file = "src/stops.txt";
-	TST<String> tree = new TST<String>();
+	public static String file = "stops.txt";
+
 	private int size;
 	private Node<Value> root;
 	
@@ -124,13 +130,33 @@ public class TST <Value>
 		return x;
 	}
 	
-	
-	
+	public Iterable<String> keysWithGivenPrefix(String prefix) {
+		if (prefix == null) {
+			throw new IllegalArgumentException("calls keysWithGivenPrefix() with a null argument");
+		}
+		Queue<String> queue = new LinkedList<String>();
+		Node<Value> x = get(root, prefix, 0);
+		if (x == null) return queue;
+		if (x.value != null) queue.add(prefix);
+		collect(x.mid, new StringBuilder(prefix), queue);
+		return queue;
+	}
+
+	private void collect(Node<Value> x, StringBuilder prefix, Queue<String> queue) {
+		if (x == null) return;
+		collect(x.left,  prefix, queue);
+		if (x.value != null) queue.add(prefix.toString() + x.character);
+		collect(x.mid,   prefix.append(x.character), queue);
+		prefix.deleteCharAt(prefix.length() - 1);
+		collect(x.right, prefix, queue);
+	}
 	
 	public static String formatAddress(String address)
 	{
+		
 		String[] parts = address.split(",");
-		String stopName = parts[3].trim();
+		
+		String stopName = parts[2].trim();
 		String [] splitAddress = stopName.split(" ");
 		String startOfAddress = splitAddress[0].trim();
 		String endOfAddress = "";
@@ -156,43 +182,71 @@ public class TST <Value>
 			}
 
 		}
-		else return address;
+		else return stopName;
 	}
 	
 	
 	
-	public static void returnTreeFromFile()
-	{
 
-		Scanner myReader = new Scanner(file);
-		
-		
-		while(myReader.hasNextLine())
-		{
-			String data = myReader.nextLine();
-			formatAddress(data);
-		}
-	}
 	
 	public static void main(String[] args)
 	{
 		TST<String> tree = new TST<String>();
-		TST<String> newTree = tree.returnTreeFromFile();
-		System.out.println("Please enter the first name of the stop you're looking for:");
-		Scanner userInput = new Scanner(System.in);
 
-		String stopName = userInput.nextLine();
+		try {
+			File filePath = new File("stops.txt");
+			String line = "";
+			BufferedReader br = new BufferedReader(new FileReader(filePath));
 
-		
-		System.out.println("Heres the information on that stop " + tree.get(stopName));
+
+			while((line = br.readLine()) != null)
+			{
+				String addressKey = formatAddress(line); 
+				tree.put(addressKey, line);			
+			}
+
+		}
+		catch(FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		System.out.println("Enter 1 if you want to search by first name or enter 2 if you want to search by full address");
+		Scanner firstQuestion = new Scanner(System.in);
+		if(firstQuestion.hasNext("1"))
+		{
+			System.out.println("Please enter the first name of the stop you're looking for (using all capital letters): ");
+			Scanner userInput1 = new Scanner(System.in);
+
+			String stopName1 = userInput1.nextLine();
+			String output = "";
+			
+			for(String element: tree.keysWithGivenPrefix(stopName1))
+			{
+				System.out.println("The information for this stop is :(Stop ID, Stop Code, Stop Name, Stop Address, Stop Latitude, Stop Longitude, Zone ID, Stop URL, Location Type, Parent Station): " + element);
+			}
+
+		}
+
+		else if(firstQuestion.hasNext("2"))
+		{
+			System.out.println("Please enter the full address of the stop you're looking for:");
+			Scanner userInput2 = new Scanner(System.in);
+
+			String stopName2 = userInput2.nextLine();
+
+			if(tree.contains(stopName2)) {
+				System.out.println("Heres the information on that stop: " + tree.get(stopName2));
+			}
+			else
+			{
+				System.out.println("Please enter a correct name");
+			}
+
+		}
 	}
-	
-	public static String [] stopArray = new String[file.length()];
-	
-	public static void stopArray(String string, int i)
-	{
-		stopArray[i] = string;
-	}
-	
-	
 }
